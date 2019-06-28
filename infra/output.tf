@@ -6,6 +6,10 @@ output "vpc_cidr" {
   value = module.vpc.vpc_cidr_block
 }
 
+output "public_subnet_ids" {
+  value = module.vpc.public_subnets
+}
+
 output "es_subnet_ids" {
   value = module.vpc.elasticache_subnets
 }

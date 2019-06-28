@@ -32,8 +32,8 @@ data "terraform_remote_state" "infra" {
   }
 }
 
-resource "aws_security_group" "es" {
-  name        = "vpc-elasticsearch-${var.es_domain}"
+resource "aws_security_group" "elasticsearch" {
+  name        = "vpc-elasticsearch-${var.elasticsearch_domain}"
   vpc_id       = data.terraform_remote_state.infra.outputs.vpc_id
 
   ingress {
@@ -47,21 +47,26 @@ resource "aws_security_group" "es" {
   }
 }
 
-resource "aws_iam_service_linked_role" "es" {
+resource "aws_iam_service_linked_role" "elasticsearch" {
   aws_service_name = "es.amazonaws.com"
 }
 
 # Create an Elasticsearch cluster
-resource "aws_elasticsearch_domain" "example" {
-  domain_name           = "${var.domain}"
-  elasticsearch_version = "6.3"
+resource "aws_elasticsearch_domain" "domain" {
+  domain_name           = var.elasticsearch_domain
+  elasticsearch_version = var.elasticsearch_version
+
+  ebs_options {
+    ebs_enabled = true
+    volume_size = 20
+  }
 
   cluster_config {
-    instance_type = "m4.large.elasticsearch"
+    instance_type = var.elasticsearch_flavor
   }
 
   vpc_options {
-    subnet_ids = data.terraform_remote_state.infra.outputs.es_subnet_ids
+    subnet_ids = [data.terraform_remote_state.infra.outputs.es_subnet_ids[0]]
 
     security_group_ids = ["${aws_security_group.elasticsearch.id}"]
   }
@@ -74,9 +79,9 @@ resource "aws_elasticsearch_domain" "example" {
     automated_snapshot_start_hour = 23
   }
 
-  tags = locals.tags
+  tags = local.tags
 
   depends_on = [
-    "aws_iam_service_linked_role.es",
+    "aws_iam_service_linked_role.elasticsearch",
   ]
 }

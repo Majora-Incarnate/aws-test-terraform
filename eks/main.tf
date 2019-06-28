@@ -32,7 +32,7 @@ data "terraform_remote_state" "infra" {
   }
 }
 
-module "eks-cluster" {
+module "eks_cluster" {
   source       = "terraform-aws-modules/eks/aws"
   cluster_name = "${var.environment}-${var.tenant}"
   subnets      = data.terraform_remote_state.infra.outputs.eks_subnet_ids
@@ -40,11 +40,18 @@ module "eks-cluster" {
 
   worker_groups = [
     {
+      name = "main_agent"
       instance_type = var.worker_flavor
-      asg_max_size  = var.worker_asg_max_size
-      tags = local.tags
+      asg_desired_capacity = var.worker_desired_capacity
+      asg_max_size = var.worker_desired_capacity
+      asg_min_size = var.worker_desired_capacity
     }
   ]
 
   tags = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "worker-elasticsearch" {
+  role       = module.eks_cluster.worker_iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonESFullAccess"
 }

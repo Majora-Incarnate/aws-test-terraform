@@ -5,9 +5,9 @@ variable "tenant" {
   default = "default"
 }
 variable "worker_flavor" {
-  default = "t2.medium"
+  default = "t2.small"
 }
-variable "worker_asg_max_size" {
+variable "worker_desired_capacity" {
   default = 3
 }
 variable "aws_region" {

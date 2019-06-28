@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    key            = "elasticsearch/terraform.tfstate"
+    key            = "services/terraform.tfstate"
     bucket         = "trevin-terraform-state"
     region         = "us-east-2"
     encrypt        = true

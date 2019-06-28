@@ -4,15 +4,6 @@ variable "environment" {
 variable "tenant" {
   default = "default"
 }
-variable "elasticsearch_domain" {
-  default = "default"
-}
-variable "elasticsearch_version" {
-  default = "6.7"
-}
-variable "elasticsearch_flavor" {
-  default = "t2.small.elasticsearch"
-}
 variable "aws_region" {
   default = "us-east-2"
 }
