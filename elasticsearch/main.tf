@@ -47,6 +47,7 @@ resource "aws_security_group" "elasticsearch" {
   }
 }
 
+// I saw this in the vpc example for the elasticsearch setup, but not sure if it is actually necessary?
 resource "aws_iam_service_linked_role" "elasticsearch" {
   aws_service_name = "es.amazonaws.com"
 }

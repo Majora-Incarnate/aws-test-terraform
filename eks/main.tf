@@ -51,7 +51,19 @@ module "eks_cluster" {
   tags = local.tags
 }
 
+// For fluentd -> elasticsearch to work on EKS, we need to ensure all workers can send to Elasticsearch
 resource "aws_iam_role_policy_attachment" "worker-elasticsearch" {
   role       = module.eks_cluster.worker_iam_role_name
   policy_arn = "arn:aws:iam::aws:policy/AmazonESFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "worker-elasticsearch-cognito" {
+  role       = module.eks_cluster.worker_iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonESCognitoAccess"
+}
+
+// I'm giving these workers a lot of privs but whatev, this allows me to manage cron runs of prowler AND get logs easy like
+resource "aws_iam_role_policy_attachment" "worker-prowler" {
+  role       = module.eks_cluster.worker_iam_role_name
+  policy_arn = "arn:aws:iam::aws:policy/SecurityAudit"
 }

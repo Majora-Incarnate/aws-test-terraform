@@ -30,6 +30,7 @@ module "vpc" {
   private_subnets     = var.aws_eks_subnets
   public_subnets      = var.aws_public_subnets
 
+  // I don't really know what I'm doing here but since this is on in almost all examples, let's leave that there
   enable_nat_gateway = true
   single_nat_gateway = true
 

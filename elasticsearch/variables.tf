@@ -1,9 +1,12 @@
+# Meant to allow standing up isolated stacks, not implemented
 variable "environment" {
   default = "dev"
 }
 variable "tenant" {
   default = "default"
 }
+
+# Resource configuration variables
 variable "elasticsearch_domain" {
   default = "default"
 }
@@ -13,6 +16,8 @@ variable "elasticsearch_version" {
 variable "elasticsearch_flavor" {
   default = "t2.small.elasticsearch"
 }
+
+# AWS Related Vars
 variable "aws_region" {
   default = "us-east-2"
 }

@@ -85,12 +85,15 @@ data "helm_repository" "incubator" {
     url  = "https://kubernetes-charts-incubator.storage.googleapis.com"
 }
 
+// I really wish the helm/kubernetes providers supported loading in memory or leading from a var rather than requiring a local file
+// That or at least let me traverse the kubeconfig so I could input the necessary items, or maybe I just missed the output to allow that
 resource "null_resource" "write_kube_config" {
 provisioner "local-exec" {
 command = "echo '${data.terraform_remote_state.eks.outputs.kubeconfig}' > ./kubeconfig.yaml"
 }
 }
 
+// Setting up tiller for RBAC since I believe RBAC is enabled by default in EKS land
 resource "kubernetes_namespace" "tiller" {
   metadata {
     name = "tiller"
@@ -127,7 +130,7 @@ resource "kubernetes_cluster_role_binding" "tiller_cluster_role_binding" {
   depends_on = [kubernetes_service_account.tiller_service_account]
 }
 
-# Kubernetes provider doesn't handle ZDD but ideally I wouldn't be managing things deployed onto Kube with terraform anyway
+// I'm lazy, and it's probably just easier to deploy this service through the k8s provider than helm chart or anything like that
 resource "kubernetes_deployment" "webserver" {
   metadata {
     name = "webserver"
@@ -214,6 +217,9 @@ resource "kubernetes_ingress" "webserver" {
   }
 }
 
+// For whatever reason, fluentd has trouble determining elasticsearch versions so let's go ahead and override
+// defaults and hardcode fluentd to assume it is elasticsearch 6 which is what we use. Could probably leverage
+// templating of some sort here but I'm lazy and major version changes should be uncommon
 data "local_file" "fluentd_output_conf" {
     filename = "${path.module}/files/fluentd-values.yaml"
 }
@@ -276,6 +282,7 @@ resource "helm_release" "aws_alb_ingress_controller" {
   depends_on = [kubernetes_service_account.tiller_service_account]
 }
 
+// source https://kubernetes-sigs.github.io/aws-alb-ingress-controller/examples/iam-policy.json
 data "aws_iam_policy_document" "aws_alb_ingress_controller" {
   statement {
     sid    = "awsAlbIngressAllowReadCertificates"

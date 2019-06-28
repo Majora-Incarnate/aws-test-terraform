@@ -1,15 +1,12 @@
+# Meant to allow standing up isolated stacks, not implemented
 variable "environment" {
   default = "dev"
 }
 variable "tenant" {
   default = "default"
 }
-variable "aws_region" {
-  default = "us-east-2"
-}
-variable "aws_s3_bucket" {
-  default = "trevin-terraform-state"
-}
+
+# Resource configuration variables
 variable "vpc_cidr" {
   default = "10.0.0.0/16"
 }
@@ -24,6 +21,14 @@ variable "aws_eks_subnets" {
 }
 variable "aws_public_subnets" {
   default = []
+}
+
+# AWS Related Vars
+variable "aws_region" {
+  default = "us-east-2"
+}
+variable "aws_s3_bucket" {
+  default = "trevin-terraform-state"
 }
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
