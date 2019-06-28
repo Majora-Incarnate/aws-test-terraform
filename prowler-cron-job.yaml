@@ -1,0 +1,39 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: prowler
+  namespace: default
+  labels:
+    app.kubernetes.io/name: prowler
+    app.kubernetes.io/instance: prowler
+    app.kubernetes.io/managed-by: prowler
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "14 4 * * *"
+  jobTemplate:
+    metadata:
+      annotations:
+        iam.amazonaws.com/role: arn:aws:iam::076854570680:role/dev-default20190627020757952300000005 # This is me being lazy, gotta grab the worker role arn
+      labels:
+        app.kubernetes.io/name: prowler
+        app.kubernetes.io/instance: prowler
+        app.kubernetes.io/managed-by: prowler
+        kubernetes.io/cluster-service: "true"
+    spec:
+      completions: 1
+      parallelism: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: prowler
+            app.kubernetes.io/instance: prowler
+            app.kubernetes.io/managed-by: prowler
+            kubernetes.io/cluster-service: "true"
+        spec:
+          containers:
+          - name: prowler
+            image: toniblyx/prowler
+          restartPolicy: Never
